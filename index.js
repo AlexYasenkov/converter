@@ -12,7 +12,7 @@ const db = mysql.createConnection({
   host: host,
   user: user,
   password: password,
-  //database: 'nodedata',
+  database: 'nodedata',
   charset: 'utf8mb4_unicode_ci'
 });
 db.connect((err) => {
