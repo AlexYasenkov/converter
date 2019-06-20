@@ -1,0 +1,31 @@
+{% extends 'layouts/main.twig' %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <form action="/logout" class="my-1" method="POST">
+          <button type="submit" class="btn btn-outline-secondary">Logout</button>
+        </form>
+        <form action="/converter" class="mt-5" method="POST">
+          <div class="form-group">
+            <label for="sel1">Select currency:</label>
+            <select class="form-control" name="currency" id="sel1">
+              {% for currency in allCurrency %}
+              <option>{{ currency }}</option>  
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <input type="number" class="form-control" name="amount" placeholder="Enter amount">
+            {% if (error.amount) %}
+              <div class="alert alert-danger py-1" role="alert">
+                {{ error.amount.msg }}
+              </div>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-outline-secondary">Generate transaction</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
