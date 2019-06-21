@@ -4,7 +4,7 @@ module.exports = (app, db, check, validationResult, request, passport) => {
 
   /* App routes */
   app.get('/', (req, res) => {
-    console.log(req.session);
+    //console.log(req.session);
     return res.render('welcome');
   });
 
@@ -40,7 +40,8 @@ module.exports = (app, db, check, validationResult, request, passport) => {
     check('user', 'Provide correct name').trim().isLength({min: 1, max: 50}),
     check('email', 'Provide correct email').trim().isLength({min: 1, max: 50}),
     check('email', 'Email must be a valid email address').isEmail(),
-    check('password', 'Provide correct password').trim().isLength({min: 3, max: 50})
+    check('password', 'Provide correct password').trim(),
+    check('password', 'Password must be at least 3').isLength({min: 3, max: 50})
   ], (req, res) => {
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -58,6 +59,7 @@ module.exports = (app, db, check, validationResult, request, passport) => {
     }
   });
 
+  /* Access to currency converter */
   let auth = (req, res, next) => {
     if (req.isAuthenticated()) {
       next();
@@ -76,6 +78,27 @@ module.exports = (app, db, check, validationResult, request, passport) => {
   app.post('/logout', (req, res) => {
     req.logout();
     res.redirect(303, '/');
+  });
+
+  app.post('/transaction', (req, res) => {
+    let allTransaction = [];
+    let currency = req.body.currency;
+    request(`https://api.exchangeratesapi.io/latest?base=${currency}`, (error, response, body) => {
+      let data = JSON.parse(body);
+      let rates = Object.values(data);
+      for (let i = 0; i < 10; i++) {
+        let amount = Math.floor(Math.random()*100+100);
+        let convertedAmount = (amount * rates[2].EUR).toFixed(4);
+        let transaction = {
+          date: rates[1],
+          currency: rates[0],
+          amount: amount,
+          convertedAmount: convertedAmount
+        };
+        allTransaction.push(transaction);
+      }
+      return res.render('transaction', {transactions: allTransaction});
+    });
   });
 
 }

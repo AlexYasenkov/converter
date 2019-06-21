@@ -1,0 +1,32 @@
+{% extends 'layouts/main.twig' %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-8 mx-auto">
+        <a href="/converter" class="btn btn-outline-secondary my-3" role="button">Go back</a>
+        <table class="table table-bordered text-center">
+          <thead class="thead-dark">
+            <tr>
+              <th>#</th>
+              <th>currency</th>
+              <th>amount</th>
+              <th>EUR</th>
+              <th>date</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for keys, transaction in transactions %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ transaction.currency }}</td>
+              <td>{{ transaction.amount }}</td>
+              <td>{{ transaction.convertedAmount }}</td>
+              <td>{{ transaction.date }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
