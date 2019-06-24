@@ -6,17 +6,22 @@ const request = require('request');
 const {check, validationResult} = require('express-validator/check');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const csrf = require('csurf');
+
+//hashPassword
+const bcrypt = require('bcrypt');
+const salt = 10;
 
 //DB
 const mysql = require('mysql');
 const host = 'localhost';
 const user = 'root';
-const password = 'sanek123';
+const password = 'root';
 const db = mysql.createConnection({
   host: host,
   user: user,
   password: password,
-  database: 'nodedata',
+  //database: 'nodedata',
   charset: 'utf8mb4_unicode_ci'
 });
 db.connect((err) => {
@@ -29,7 +34,6 @@ const app = express();
 const port = 3000;
 
 app.set('view engine', 'twig');
-
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -44,11 +48,12 @@ app.use(session({
     maxAge: 60*60*1000
   }
 }));
+app.use(csrf());
 app.use(passport.initialize());
 app.use(passport.session());
 
-require('./auth/passport')(passport, LocalStrategy, db);
-require('./routes/web')(app, db, check, validationResult, request, passport);
+require('./auth/passport')(passport, LocalStrategy, db, bcrypt);
+require('./routes/web')(app, db, check, validationResult, request, passport, bcrypt, salt);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
