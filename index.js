@@ -13,15 +13,17 @@ const bcrypt = require('bcrypt');
 const salt = 10;
 
 //DB
+require('dotenv').config();
 const mysql = require('mysql');
-const host = 'localhost';
-const user = 'root';
-const password = 'root';
+const host = process.env.DB_HOST;
+const user = process.env.DB_USER;
+const password = process.env.DB_PASS;
+const database = process.env.DB_NAME;
 const db = mysql.createConnection({
   host: host,
   user: user,
   password: password,
-  //database: 'nodedata',
+  database: database,
   charset: 'utf8mb4_unicode_ci'
 });
 db.connect((err) => {

@@ -92,12 +92,12 @@ module.exports = (app, db, check, validationResult, request, passport, bcrypt, s
       let rates = Object.values(data);
       for (let i = 0; i < 100; i++) {
         let amount = Math.floor(Math.random()*100+100);
-        let convertedAmount = (amount * rates[2].EUR).toFixed(4);
+        let convertedAmount = (amount * rates[0].EUR).toFixed(4);
         let date = new Date();
         let transactionDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
         let transaction = {
           date: transactionDate,
-          currency: rates[0],
+          currency: currency,
           amount: amount,
           convertedAmount: convertedAmount
         };
