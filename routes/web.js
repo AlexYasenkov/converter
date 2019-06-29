@@ -1,9 +1,5 @@
 module.exports = (app, db, check, validationResult, request, passport, bcrypt, salt) => {
 
-  /* Database seeding */
-  require('../database/seeding')(app, db);
-
-  /* App routes */
   app.get('/', (req, res) => {
     return res.render('welcome');
   });
@@ -44,11 +40,11 @@ module.exports = (app, db, check, validationResult, request, passport, bcrypt, s
   ], (req, res) => {
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.render('register', {error: errors.mapped(), csrfToken: req.csrfToken() });
+      res.render('register', { error: errors.mapped(), csrfToken: req.csrfToken() });
     } else {
       db.query('SELECT * FROM users WHERE email = ?', req.body.email, (err, result) => {
         if (err) throw err;
-        let email = (result.length === 0) ? 'first record in db' : result[0].email;
+        let email = (result.length === 0) ? '' : result[0].email;
         if (email === req.body.email) {
           res.redirect('/login');
         } else {

@@ -5,3 +5,4 @@
 3. В ТЗ используется база данных **MySQL**.
 4. В корне проекта создайте файл **.env** на основе файла **.env.example**.
 5. Заполните файл с указанием настроек базы данных.
+6. Для создания необходимых таблиц введите в консоли **node node_modules/db-migrate/bin/db-migrate up -m ./database/migrations --config ./database/config/dev.json**
