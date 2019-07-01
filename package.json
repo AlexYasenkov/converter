@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --ignore sessions/ index.js"
+    "dev": "nodemon --ignore sessions/ index.js",
+    "migrate": "node node_modules/db-migrate/bin/db-migrate up -m ./database/migrations --config ./database/config/dev.json"
   },
   "author": "Aleksandr Yasenkov",
   "license": "ISC",
