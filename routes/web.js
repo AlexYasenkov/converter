@@ -64,43 +64,55 @@ module.exports = (app, db, check, validationResult, request, passport, bcrypt, s
     res.redirect(303, '/');
   });
 
-  /* Access to currency converter */
-  let auth = (req, res, next) => {
+  /* Access to closed sections */
+  const auth = (req, res, next) => {
     if (req.isAuthenticated()) {
       next();
     } else {
       res.redirect('/');
     }
   }
+
   app.get('/converter', auth, (req, res) => {
-    request('https://api.exchangeratesapi.io/latest', (error, response, body) => {
-      let data = JSON.parse(body);
-      let currency = Object.keys(data.rates);
-      res.render('converter', { allCurrency: currency, csrfToken: req.csrfToken() });
-    });
+    return res.render('converter', { csrfToken: req.csrfToken() });
   });
 
-  app.post('/transaction', (req, res) => {
+  app.get('/transactions', auth, (req, res) => {
+    let service = 'https://7np770qqk5.execute-api.eu-west-1.amazonaws.com/prod/get-transaction';
+    let urls = [];
+    for (let i = 0; i < 100; i++) {
+      urls.push(service);
+    }
+    let result = [];
+    let count = 0;
     let allTransactions = [];
-    let currency = req.body.currency;
-    request(`https://api.exchangeratesapi.io/latest?base=${currency}`, (error, response, body) => {
-      let data = JSON.parse(body);
-      let rates = Object.values(data);
-      for (let i = 0; i < 100; i++) {
-        let amount = Math.floor(Math.random()*100+100);
-        let convertedAmount = (amount * rates[0].EUR).toFixed(4);
-        let date = new Date();
-        let transactionDate = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
-        let transaction = {
-          date: transactionDate,
-          currency: currency,
-          amount: amount,
-          convertedAmount: convertedAmount
-        };
-        allTransactions.push(transaction);
-      }
-      return res.render('transaction', { transactions: allTransactions });
-    });
+    for (i in urls) {
+      request(urls[i], function (error, response, body) {
+        let data = JSON.parse(body);
+        result.push(data);
+        count++;
+        if ( count === urls.length ) {
+          for (let i = 0; i < result.length; i++) {
+            request(`https://api.exchangeratesapi.io/latest?base=${result[i].currency}`, function (error, response, body) {
+              let data = JSON.parse(body);
+              let rates = Object.values(data);
+              let transaction = {
+                createdAt: result[i].createdAt,
+                currency: result[i].currency,
+                amount: result[i].amount,
+                convertedAmount: (result[i].amount * rates[0].EUR).toFixed(4),
+                exchangeUrl: 'https://api.exchangeratesapi.io/latest?base=EUR',
+                checksum: result[i].checksum
+              };
+              allTransactions.push(transaction);
+              if (allTransactions.length === result.length) {
+                return res.render('transactions', { transactions: allTransactions });
+              }
+            });
+          }
+        }
+      });
+    }
   });
 
 }

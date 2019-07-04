@@ -7,18 +7,7 @@
           <input type="hidden" name="_csrf" value="{{csrfToken}}">
           <button type="submit" class="btn btn-outline-secondary">Logout</button>
         </form>
-        <form action="/transaction" class="mt-5" method="POST">
-          <div class="form-group">
-            <label for="sel1">Select currency:</label>
-            <select class="form-control" name="currency" id="sel1">
-              {% for currency in allCurrency %}
-              <option>{{ currency }}</option>  
-              {% endfor %}
-            </select>
-          </div>
-          <input type="hidden" name="_csrf" value="{{csrfToken}}">
-          <button type="submit" class="btn btn-outline-secondary">Generate transaction</button>
-        </form>
+        <a href="/transactions" class="btn btn-outline-secondary my-3" role="button">Generate transactions</a>
       </div>
     </div>
   </div>
