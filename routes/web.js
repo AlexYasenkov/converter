@@ -80,33 +80,44 @@ module.exports = (app, db, check, validationResult, request, passport, bcrypt, s
   app.get('/transactions', auth, (req, res) => {
     let service = 'https://7np770qqk5.execute-api.eu-west-1.amazonaws.com/prod/get-transaction';
     let urls = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1; i++) {
       urls.push(service);
     }
     let result = [];
     let count = 0;
     let allTransactions = [];
-    for (i in urls) {
-      request(urls[i], function (error, response, body) {
+    for (let i in urls) {
+      request(urls[i], (error, response, body) => {
         let data = JSON.parse(body);
         result.push(data);
         count++;
-        if ( count === urls.length ) {
+        if (count === urls.length) {
           for (let i = 0; i < result.length; i++) {
-            request(`https://api.exchangeratesapi.io/latest?base=${result[i].currency}`, function (error, response, body) {
+            request(`https://api.exchangeratesapi.io/latest?base=${result[i].currency}`, (error, response, body) => {
               let data = JSON.parse(body);
               let rates = Object.values(data);
               let transaction = {
                 createdAt: result[i].createdAt,
                 currency: result[i].currency,
-                amount: result[i].amount,
-                convertedAmount: (result[i].amount * rates[0].EUR).toFixed(4),
+                amount: Number(result[i].amount),
+                convertedAmount: Number((result[i].amount * rates[0].EUR).toFixed(4)),
                 exchangeUrl: 'https://api.exchangeratesapi.io/latest?base=EUR',
                 checksum: result[i].checksum
               };
               allTransactions.push(transaction);
               if (allTransactions.length === result.length) {
-                return res.render('transactions', { transactions: allTransactions });
+                let converted = {
+                  transactions: allTransactions
+                };
+                let formData = JSON.stringify(converted);
+                console.log(formData);
+                request.post({ url:'https://7np770qqk5.execute-api.eu-west-1.amazonaws.com/prod/process-transactions', formData: formData }, function optionalCallback(err, httpResponse, body) {
+                  if (err) {
+                    return console.error('upload failed:', err);
+                  }
+                  console.log('Upload successful!  Server responded with:', body);
+                });
+                res.render('transactions', { transactions: allTransactions });
               }
             });
           }
@@ -114,5 +125,4 @@ module.exports = (app, db, check, validationResult, request, passport, bcrypt, s
       });
     }
   });
-
 }
