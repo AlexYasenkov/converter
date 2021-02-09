@@ -1,0 +1,14 @@
+{% extends 'layouts/main.twig' %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <form action="/logout" class="my-1" method="POST">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <button type="submit" class="btn btn-outline-secondary">Logout</button>
+        </form>
+        <a href="/transactions" class="btn btn-outline-secondary my-3" role="button">Generate transactions</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
